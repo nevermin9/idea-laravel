@@ -154,3 +154,29 @@ This project has domain-specific skills available in `**/skills/**`. You MUST ac
 - Do NOT delete tests without approval.
 
 </laravel-boost-guidelines>
+
+# Project: Idea
+
+App for tracking project ideas. **Idea** belongs to **User** and has many **Steps**. Status is the `IdeaStatus` enum (`PENDING`, `IN_PROGRESS`, `COMPLETED`); `links` is cast to `ArrayObject`; `image_path` stores an optional image.
+
+## Dev workflow
+
+- Standard local dev is `composer run dev` (runs `php artisan serve`, `queue:listen`, `pail`, and `npm run dev` concurrently with labeled output). Don't just start `artisan serve` on its own.
+- `composer run setup` does the full first-time bootstrap (migrate + npm install + build).
+- `composer run format` runs Rector then Pint — use this, not Pint alone, since Rector enforces strict types and other rewrites.
+- `composer run test` clears config before running tests.
+
+## Strict-mode gotchas
+
+`AppServiceProvider::boot()` enables `Model::shouldBeStrict()`, `Model::unguard()`, and `Model::automaticallyEagerLoadRelationships()`. Implications:
+- Lazy loading throws — eager-load with `with()` or rely on auto eager loading; never access a relation on a freshly fetched model in a loop without it.
+- No `$fillable` needed (unguarded), but accessing a missing attribute also throws.
+
+## Database
+
+PostgreSQL (via `compose.yaml` / Sail), not SQLite. Migrations use `jsonb` for `links`. Tests run against the `testing` connection with `RefreshDatabase` applied globally in `tests/Pest.php`.
+
+## Current implementation state
+
+`IdeaController`, `StoreIdeaRequest`, `UpdateIdeaRequest`, and `IdeaPolicy` are scaffolded but **stubs** — `authorize()` returns false, `rules()` is empty, controller actions are empty, policy methods return false. Don't assume any of them have logic; check before calling.
+
