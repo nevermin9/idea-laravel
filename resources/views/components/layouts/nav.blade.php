@@ -21,7 +21,11 @@
                 <form action="/logout" method="POST">
                     @method('DELETE')
                     @csrf
-                    <button type="submit" class="btn">
+                    <button
+                        type="submit"
+                        class="btn"
+                        data-test="logout-button"
+                    >
                         Logout
                     </button>
                 </form>

@@ -29,7 +29,11 @@
                 type="password"
             />
 
-            <button type="submit" class="btn mt-2 h-10 w-full">
+            <button
+                type="submit"
+                class="btn mt-2 h-10 w-full"
+                data-test="login-button"
+            >
                 Sign in
             </button>
         </form>
