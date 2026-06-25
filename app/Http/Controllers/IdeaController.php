@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreIdeaRequest;
 use App\Http\Requests\UpdateIdeaRequest;
+use App\IdeaStatus;
 use App\Models\Idea;
+use Illuminate\Validation\Rule;
 
 class IdeaController extends Controller
 {
@@ -13,10 +15,20 @@ class IdeaController extends Controller
      */
     public function index()
     {
-        $ideas = auth()->user()->ideas()->get();
+        $status = request('status');
+
+        if (! in_array($status, array_column(IdeaStatus::cases(), 'value'))) {
+            $status = null;
+        }
+
+        $ideas = auth()->user()
+            ->ideas()
+            ->when($status, fn ($query, $status) => $query->where('status', $status))
+            ->get();
 
         return view('idea.index', [
             'ideas' => $ideas,
+            'statusCounts' => Idea::statusCounts(auth()->user()),
         ]);
     }
 
