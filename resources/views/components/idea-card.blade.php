@@ -5,7 +5,7 @@
     'href' => '#',
     'status' => ''
 ])
-<div {{ $attributes(['class' => 'border border-border rounded-lg bg-card p-4 md:text-sm relative']) }}>
+<x-card class="{{ $attributes->get('class') }}">
     <h3 class="text-foreground text-lg">
         {{ $title }}
     </h3>
@@ -29,4 +29,4 @@
         See More
         <span class="absolute inset-0"></span>
     </a>
-</div>
+</x-card>

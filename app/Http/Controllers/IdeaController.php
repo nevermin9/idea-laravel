@@ -6,24 +6,22 @@ use App\Http\Requests\StoreIdeaRequest;
 use App\Http\Requests\UpdateIdeaRequest;
 use App\IdeaStatus;
 use App\Models\Idea;
-use Illuminate\Validation\Rule;
+use Illuminate\Http\Request;
 
 class IdeaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $status = request('status');
-
-        if (! in_array($status, array_column(IdeaStatus::cases(), 'value'))) {
-            $status = null;
-        }
-
         $ideas = auth()->user()
             ->ideas()
-            ->when($status, fn ($query, $status) => $query->where('status', $status))
+            ->when(
+                in_array($request->status, array_column(IdeaStatus::cases(), 'value')),
+                fn ($query) => $query->where('status', $request->status)
+            )
+            ->latest()
             ->get();
 
         return view('idea.index', [
@@ -45,7 +43,10 @@ class IdeaController extends Controller
      */
     public function store(StoreIdeaRequest $request)
     {
-        //
+        auth()->user()->ideas()->create($request->validated());
+
+        return to_route('ideas.index')
+            ->with('success', 'Idea created successfully.');
     }
 
     /**
@@ -53,7 +54,9 @@ class IdeaController extends Controller
      */
     public function show(Idea $idea)
     {
-        //
+        return view('idea.show', [
+            'idea' => $idea,
+        ]);
     }
 
     /**
@@ -77,6 +80,8 @@ class IdeaController extends Controller
      */
     public function destroy(Idea $idea)
     {
-        //
+        $idea->delete();
+
+        return to_route('ideas.index');
     }
 }

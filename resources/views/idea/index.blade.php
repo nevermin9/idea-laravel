@@ -8,6 +8,18 @@
             <p class="text-muted-foreground text-sm mt-2">
                 Caputure your thoughts. Make a plan
             </p>
+
+            <x-card
+                x-data
+                class="mt-10 cursor-pointer h-32 w-full text-left"
+                is="button"
+                @click="$dispatch('open-modal', { id: 'create-idea' })"
+                type="button"
+            >
+                <p>
+                    What's the idea
+                </p>
+            </x-card>
         </header>
 
         <div>
@@ -57,4 +69,74 @@
             </div>
         </div>
     </div>
+
+    {{--  modals  --}}
+    <x-modal name="create-idea" title="Create Idea">
+        <form
+            x-data="{ status: @js(App\IdeaStatus::PENDING) }"
+            action="{{ route('ideas.store') }}"
+            method="POST"
+        >
+            @csrf
+
+            <div class="space-y-6">
+                <x-form.field
+                    label="Title"
+                    name="title"
+                    id="idea-title"
+                    placeholder="Enter an idea title"
+                    required
+                    autofocus
+                />
+
+                <div class="space-y-2">
+                    <label for="status" class="label">
+                        Status
+                    </label>
+
+                    <div class="flex gap-x-3">
+                        @foreach(App\IdeaStatus::cases() as $status)
+                            <button
+                                type="button"
+                                class="btn flex-1 h-10"
+                                :class="{ 'btn-outlined': status !== @js($status->value) }"
+                                @click="status = @js($status->value)"
+                            >
+                                {{ $status->label() }}
+                            </button>
+                        @endforeach
+
+                        <input
+                            type="hidden"
+                            name="status"
+                            :value="status"
+                        />
+                    </div>
+
+                    <x-form.error name="status" />
+                </div>
+
+                <x-form.field
+                    type="textarea"
+                    id="idea-description"
+                    label="Description"
+                    name="description"
+                    placeholder="Enter an idea's description"
+                />
+
+                <div class="flex justify-end gap-x-5">
+                    <button
+                        type="button"
+                        @click="$dispatch('close-modal', { id: 'create-idea' })"
+                    >
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        Create Idea
+                    </button>
+                </div>
+            </div>
+        </form>
+    </x-modal>
 </x-layouts.layout>
