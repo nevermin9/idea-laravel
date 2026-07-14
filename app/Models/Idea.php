@@ -40,6 +40,7 @@ class Idea extends Model
             ->groupBy('status')
             ->pluck('count', 'status');
 
+
         return collect(IdeaStatus::cases())
             ->mapWithKeys(fn ($status) => [
                 $status->value => $counts->get($status->value, 0),
